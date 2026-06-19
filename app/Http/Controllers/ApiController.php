@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Validator;
 use App\Models\User;
 use Illuminate\Validation\Rules\Unique;
 use App\Models\Order;
+use App\Helpers\ResponseHelper;
+    // public static function errorRes(string $message = 'Something went wrong',array $errors = [],int $code = 500) {
 
 class ApiController extends Controller
 {
@@ -47,28 +49,20 @@ class ApiController extends Controller
 
     public function getUserorders(Request $request){
 
-       $validator = Validator::make($request->all(),[
-            'id' => 'required|exists:users'
-       ]);
+      $validator = Validator::make($request->all(),[
+          'id' => 'required|exists:users'
+      ]);
 
-        if($validator->fails()){
-             
-          return response()->json([
-            'status' => false,
-            'error'  => $validator->errors()->first()
-          ]);
-        }
-     
-        //  $data = User::with('orders')->where('id',$request->id)->first();    
-         $data = User::find(1);
-
-
-         return response()->json([
-            'status' => true,
-            'message' => "user found successfully",
-            'data'   =>$data->orders
-          ]);
+      if($validator->fails()){
+        return ResponseHelper::errorRes('',$validator->errors()->first(),500);
+      }
+        $data = User::with('orders')->where('id',$request->id)->first();    
+      //  $data = User::find(1);
+        return ResponseHelper::successRes(true,"user found successfully",$data,200);
+        
          
          
     }
+
+    
 }
